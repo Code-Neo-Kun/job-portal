@@ -1,0 +1,41 @@
+/* Basic plugin styles */
+body {
+    font-family: Arial, sans-serif;
+}
+
+.company-dashboard, .job-seeker-dashboard {
+    padding: 20px;
+    border: 1px solid #ddd;
+}
+.dashboard-metrics {
+    display: flex;
+    gap: 20px;
+}
+
+.metric-box {
+    padding: 20px;
+    background-color: #f4f4f4;
+    border-radius: 5px;
+    text-align: center;
+    width: 200px;
+}
+
+table.widefat {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table.widefat th,
+table.widefat td {
+    padding: 10px;
+    text-align: left;
+}
+
+table.widefat th {
+    background-color: #f1f1f1;
+}
+
+table.widefat tr:nth-child(even) {
+    background-color: #f9f9f9;
+}

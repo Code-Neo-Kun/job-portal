@@ -1,0 +1,27 @@
+# Job Portal Plugin Translation Template
+msgid "Job Portal"
+msgstr "Job Portal"
+
+msgid "Company Dashboard"
+msgstr "Company Dashboard"
+
+msgid "Job Seeker Dashboard"
+msgstr "Job Seeker Dashboard"
+
+msgid "Registered Companies"
+msgstr "Registered Companies"
+
+msgid "Total Jobs"
+msgstr "Total Jobs"
+
+msgid "Active Jobs"
+msgstr "Active Jobs"
+
+msgid "Job Seekers"
+msgstr "Job Seekers"
+
+msgid "Job Application Submitted"
+msgstr "Job Application Submitted"
+
+msgid "Job Post Status Changed"
+msgstr "Job Post Status Changed"
