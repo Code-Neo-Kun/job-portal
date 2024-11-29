@@ -3,6 +3,7 @@ class Admin_Panel
 {
     public static function init()
     {
+        // Hook into WordPress admin menu
         add_action('admin_menu', [__CLASS__, 'add_admin_pages']);
     }
 
@@ -19,25 +20,83 @@ class Admin_Panel
             25
         );
 
-        // Submenu: Manage Companies
-        add_submenu_page(
-            'job-portal-admin',
-            'Manage Companies',
-            'Companies',
-            'manage_options',
-            'job-portal-companies',
-            [__CLASS__, 'render_manage_companies']
-        );
+        // Submenu Manage
+        $submenus = [
+            ['Manage Companies', 'Companies', 'job-portal-companies', [__CLASS__, 'render_manage_companies']],
+            ['Manage Jobseekers', 'Jobseekers', 'job-portal-jobseekers', [__CLASS__, 'render_manage_jobseekers']],
+            ['How to Set Up', 'How to Set Up', 'plugin-how-to-setup', [__CLASS__, 'render_setup_page']],
+            ['Shortcodes Documentation', 'Shortcodes Documentation', 'plugin-shortcodes-doc', [__CLASS__, 'render_shortcodes_page']],
+        ];
 
-        // Submenu: Manage Jobseekers
-        add_submenu_page(
-            'job-portal-admin',
-            'Manage Jobseekers',
-            'Jobseekers',
-            'manage_options',
-            'job-portal-jobseekers',
-            [__CLASS__, 'render_manage_jobseekers']
-        );
+        foreach ($submenus as $submenu) {
+            add_submenu_page(
+                'job-portal-admin',
+                $submenu[0],
+                $submenu[1],
+                'manage_options',
+                $submenu[2],
+                $submenu[3]
+            );
+        }
+    }
+
+    // Add a custom menu for the dashboard
+    // Function to retrieve dynamic data
+    function job_portal_get_data()
+    {
+        // Example: Retrieve dynamic data from the database
+        $data = [
+            'companies' => wp_count_posts('company')->publish,  // Custom post type: company
+            'newest_jobs' => wp_count_posts('job')->publish,    // Custom post type: job
+            'resumes' => wp_count_posts('resume')->publish,     // Custom post type: resume
+            'active_jobs' => wp_count_posts('job')->publish,    // Example: Same as 'newest_jobs'
+        ];
+
+        return $data;
+    }
+
+    /**
+     * Render the parent documentation page (will display subpages)
+     */
+    public static function render_parent_page()
+    {
+        echo '<div class="wrap">';
+        echo '<h1>Plugin Documentation</h1>';
+        echo '<p>Welcome to the plugin documentation section. Choose a topic from the left menu.</p>';
+        echo '</div>';
+    }
+
+    /**
+     * Render the "How to Set Up" sub-page
+     */
+    public static function render_setup_page()
+    {
+        echo '<div class="wrap">';
+        echo '<h1>How to Set Up</h1>';
+        echo '<p>Follow the steps below to set up the plugin:</p>';
+        echo '<ul>
+                <li>Step 1: Download the plugin.</li>
+                <li>Step 2: Install and activate the plugin in your WordPress dashboard.</li>
+                <li>Step 3: Configure the plugin settings from the settings page.</li>
+                <li>Step 4: Start using the features.</li>
+              </ul>';
+        echo '</div>';
+    }
+
+    /**
+     * Render the "Shortcodes Documentation" sub-page
+     */
+    public static function render_shortcodes_page()
+    {
+        echo '<div class="wrap">';
+        echo '<h1>Shortcodes Documentation</h1>';
+        echo '<p>Here is a list of available shortcodes you can use:</p>';
+        echo '<ul>
+                <li><strong>[job_list]</strong>: Display a list of jobs on a page.</li>
+                <li><strong>[apply_form]</strong>: Display the job application form on a page.</li>
+                <li><strong>[job_details]</strong>: Display the details of a specific job.</li>
+              </ul>';
+        echo '</div>';
     }
 
     // Dashboard Overview
@@ -45,65 +104,129 @@ class Admin_Panel
     {
         global $wpdb;
 
+        // Fetch job statistics
         $job_stats = self::get_job_stats($wpdb);
 
-        // Pass data to JavaScript for charts
+        // Provide fallback values to prevent undefined index errors
         $data = [
-            'Active Jobs' => $job_stats['active_jobs'],
-            'Inactive Jobs' => $job_stats['inactive_jobs'],
-            'Total Jobs' => $job_stats['total_jobs'],
-            'Companies' => $job_stats['companies_count'],
-            'Job Seekers' => $job_stats['job_seekers_count'],
+            'companies' => $job_stats['companies_count'] ?? 0,
+            'newest_jobs' => $job_stats['total_jobs'] ?? 0,
+            'resumes' => 0, // If you need to fetch resume data, replace this with an actual query
+            'active_jobs' => $job_stats['active_jobs'] ?? 0,
         ];
-        ?>
+?>
         <div class="wrap">
-            <h1>Job Portal Admin Dashboard</h1>
-            <p>Overview of the portal activity.</p>
-
-            <!-- Dashboard Metrics -->
-            <div class="dashboard-metrics">
-                <div class="metric-box">Companies: <?php echo esc_html($job_stats['companies_count']); ?></div>
-                <div class="metric-box">Total Jobs: <?php echo esc_html($job_stats['total_jobs']); ?></div>
-                <div class="metric-box">Job Seekers: <?php echo esc_html($job_stats['job_seekers_count']); ?></div>
-                <div class="metric-box">Active Jobs: <?php echo esc_html($job_stats['active_jobs']); ?></div>
+            <div class="sidebar">
+                <ul>
+                    <li><a href="#" data-page="dashboard">Dashboard</a>
+                    </li>
+                    <li><a href="#" data-page="companies">Companies</a>
+                    </li>
+                    <li><a href="#" data-page="jobseekers">Jobseekers</a></li>
+                    <li><a href="#" data-page="setup">Configuration</a>
+                    </li>
+                    <li><a href="#" data-page="shortcodes">Shortcodes</a></li>
+                    <li><a href="#" data-page="Jobs">Jobs</a>
+                    </li>
+                    <li><a href="#" data-page="Resume">Resume</a>
+                    </li>
+                    <li><a href="#" data-page="Reports">Reports</a>
+                    </li>
+                </ul>
             </div>
 
-            <!-- Chart Section -->
-            <div id="piechart_3d" style="width: 700px; height: 500px;"></div>
+            <div class="main">
+                <div class="header">
+                    <h1>Dashboard</h1>
+                    <div class="buttons">
+                        <button>Add Company</button>
+                        <button>All Companies</button>
+                        <button>All Jobs</button>
+                        <button>Add Job</button>
+                    </div>
+                </div>
 
-            <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-            <script type="text/javascript">
-                google.charts.load("current", { packages: ["corechart"] });
-                google.charts.setOnLoadCallback(drawChart);
+                <div class="dashboard-cards">
+                    <div class="card">
+                        <h3>Companies</h3>
+                        <span>(<?php echo esc_html($data['companies']); ?>)</span>
+                    </div>
+                    <div class="card">
+                        <h3>Newest Jobs</h3>
+                        <span>(<?php echo esc_html($data['newest_jobs']); ?>)</span>
+                    </div>
+                    <div class="card">
+                        <h3>Resume</h3>
+                        <span>(<?php echo esc_html($data['resumes']); ?>)</span>
+                    </div>
+                    <div class="card">
+                        <h3>Active Jobs</h3>
+                        <span>(<?php echo esc_html($data['active_jobs']); ?>)</span>
+                    </div>
+                </div>
 
-                function drawChart() {
-                    var data = google.visualization.arrayToDataTable([
-                        ['Metric', 'Count'],
-                        ['Active Jobs', <?php echo $data['Active Jobs']; ?>],
-                        ['Inactive Jobs', <?php echo $data['Inactive Jobs']; ?>],
-                        ['Total Jobs', <?php echo $data['Total Jobs']; ?>],
-                        ['Companies', <?php echo $data['Companies']; ?>],
-                        ['Job Seekers', <?php echo $data['Job Seekers']; ?>]
-                    ]);
+                <div class="additional-content">
+                    <div class="box">
+                        <h4>How to Set Up WP Job Portal</h4>
+                        <p>Find step-by-step setup instructions and access tutorial videos.</p>
+                        <button>How to Set Up</button>
+                        <button>Visit Help Page</button>
+                    </div>
+                    <div class="box">
+                        <h4>Shortcodes</h4>
+                        <p>Explore all shortcodes and watch tutorials on creating pages.</p>
+                        <button>Shortcodes</button>
+                    </div>
+                    <div class="box">
+                        <h4>Manage Addons</h4>
+                        <p>Check the status of your addons and install new ones.</p>
+                        <button>Check Status</button>
+                        <button>Install Guide</button>
+                    </div>
+                </div>
 
-                    var options = {
-                        title: 'Job Portal Statistics',
-                        is3D: true,
-                        pieSliceText: 'value',
-                    };
+                <!-- Charts Section -->
+                <div class="charts">
+                    <h3>Job Portal Statistics</h3>
+                    <div id="piechart_3d" style="width: 400px; height: 300px;"></div>
 
-                    var chart = new google.visualization.PieChart(document.getElementById('piechart_3d'));
-                    chart.draw(data, options);
-                }
-            </script>
+                    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+                    <script type="text/javascript">
+                        google.charts.load("current", {
+                            packages: ["corechart"]
+                        });
+                        google.charts.setOnLoadCallback(drawChart);
+
+                        function drawChart() {
+                            var data = google.visualization.arrayToDataTable([
+                                ['Metric', 'Count'],
+                                ['Active Jobs', <?php echo esc_js($data['active_jobs']); ?>],
+                                ['Companies', <?php echo esc_js($data['companies']); ?>],
+                                ['Newest Jobs', <?php echo esc_js($data['newest_jobs']); ?>],
+                                ['Resumes', <?php echo esc_js($data['resumes']); ?>]
+                            ]);
+
+                            var options = {
+                                title: 'Job Portal Statistics',
+                                is3D: true,
+                            };
+
+                            var chart = new google.visualization.PieChart(document.getElementById('piechart_3d'));
+                            chart.draw(data, options);
+                        }
+                    </script>
+                </div>
+            </div>
         </div>
-        <?php
+
+    <?php
     }
+
 
     // Manage Companies
     public static function render_manage_companies()
     {
-        ?>
+    ?>
         <div class="wrap">
             <h1>Registered Companies</h1>
             <?php
@@ -129,13 +252,13 @@ class Admin_Panel
             }
             ?>
         </div>
-        <?php
+    <?php
     }
 
     // Manage Jobseekers
     public static function render_manage_jobseekers()
     {
-        ?>
+    ?>
         <div class="wrap">
             <h1>Registered Jobseekers</h1>
             <?php
@@ -161,9 +284,10 @@ class Admin_Panel
             }
             ?>
         </div>
-        <?php
+<?php
     }
 
+    // Fetch job statistics
     // Fetch job statistics
     public static function get_job_stats($wpdb)
     {
@@ -174,15 +298,17 @@ class Admin_Panel
         $companies_count = count(get_users(['role' => 'company']));
         $job_seekers_count = count(get_users(['role' => 'job_seeker']));
 
+        // Ensure all keys are included in the array
         return [
-            'total_jobs' => $total_jobs,
-            'active_jobs' => $active_jobs,
-            'inactive_jobs' => $inactive_jobs,
-            'companies_count' => $companies_count,
-            'job_seekers_count' => $job_seekers_count,
+            'total_jobs' => $total_jobs ?: 0,
+            'active_jobs' => $active_jobs ?: 0,
+            'inactive_jobs' => $inactive_jobs ?: 0,
+            'companies_count' => $companies_count ?: 0,
+            'job_seekers_count' => $job_seekers_count ?: 0,
         ];
     }
 }
 
 // Initialize the Admin Panel class
 Admin_Panel::init();
+?>

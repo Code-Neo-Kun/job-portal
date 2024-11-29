@@ -1,6 +1,7 @@
 /* Basic plugin styles */
 body {
     font-family: Arial, sans-serif;
+    background: #99b6c79e;
 }
 
 .company-dashboard, .job-seeker-dashboard {
@@ -39,3 +40,109 @@ table.widefat th {
 table.widefat tr:nth-child(even) {
     background-color: #f9f9f9;
 }
+
+.sidebar {
+    width: 250px;
+    background: #fff;
+    height: 100vh;
+    position: fixed;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+.sidebar ul li, li a:focus{
+    list-style-type: none;
+    margin: 0;
+    outline: none;
+    box-shadow:none
+}
+
+.sidebar a {
+    display: block;
+    padding: 15px;
+    color: #333;
+    text-decoration: none;
+    border-bottom: 1px solid #ddd;
+}
+
+.sidebar a:hover {
+    background: #0073e6;
+    color: white;
+}
+
+.main {
+    margin-left: 250px;
+    padding: 20px;
+}
+
+.header {
+    background: #FFF;
+    border-radius:10px;    color: white;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header .buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.header button {
+    background: #f7b12c;
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    cursor: pointer;
+}
+
+.header button:hover {
+    background: #e0a122;
+}
+
+.dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    text-align: center;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.card h3 {
+    margin: 0;
+    font-size: 1.5em;
+    color: #333;
+}
+
+.card span {
+    display: block;
+    font-size: 1.2em;
+    color: #666;
+}
+
+.additional-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.box {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.box h4 {
+    margin: 0 0 10px;
+}
+
+
+/* register form css */
+
